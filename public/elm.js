@@ -10536,31 +10536,253 @@ var $elm$core$Basics$never = function (_v0) {
 	}
 };
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$Model = function (property) {
-	return {property: property};
-};
+var $author$project$Main$Model = F2(
+	function (input, status) {
+		return {input: input, status: status};
+	});
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		$author$project$Main$Model('hehe'),
+		A2($author$project$Main$Model, '', _List_Nil),
 		$elm$core$Platform$Cmd$none);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $author$project$Main$Check = {$: 'Check'};
+var $ccapndave$elm_update_extra$Update$Extra$andThen = F3(
+	function (update, msg, _v0) {
+		var model = _v0.a;
+		var cmd = _v0.b;
+		var _v1 = A2(update, msg, model);
+		var model_ = _v1.a;
+		var cmd_ = _v1.b;
+		return _Utils_Tuple2(
+			model_,
+			$elm$core$Platform$Cmd$batch(
+				_List_fromArray(
+					[cmd, cmd_])));
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'Msg1') {
-			return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-		} else {
-			return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+		switch (msg.$) {
+			case 'Input':
+				var text = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{input: text}),
+					$elm$core$Platform$Cmd$none);
+			case 'Submit':
+				return A3(
+					$ccapndave$elm_update_extra$Update$Extra$andThen,
+					$author$project$Main$update,
+					$author$project$Main$Check,
+					_Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								status: A2($elm$core$List$cons, 'Submitted', model.status)
+							}),
+						$elm$core$Platform$Cmd$none));
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							status: A2($elm$core$List$cons, 'Valid', model.status)
+						}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Main$Input = function (a) {
+	return {$: 'Input', a: a};
+};
+var $author$project$Main$Submit = {$: 'Submit'};
+var $author$project$Main$reduce = F2(
+	function (text, _v0) {
+		var pos = _v0.a;
+		var list = _v0.b;
+		switch (text) {
+			case 'u':
+				return _Utils_Tuple2(
+					pos + 2,
+					A2(
+						$elm$core$List$cons,
+						_Utils_Tuple2(text, pos + 1),
+						list));
+			case 'd':
+				return _Utils_Tuple2(
+					pos - 2,
+					A2(
+						$elm$core$List$cons,
+						_Utils_Tuple2(text, pos - 1),
+						list));
+			default:
+				return _Utils_Tuple2(
+					pos,
+					A2(
+						$elm$core$List$cons,
+						_Utils_Tuple2(text, pos),
+						list));
+		}
+	});
+var $elm$core$String$words = _String_words;
+var $author$project$Main$logic = function (text) {
+	var list = $elm$core$String$words(text);
+	return $elm$core$List$reverse(
+		A3(
+			$elm$core$Basics$apR,
+			_Utils_Tuple2(0, _List_Nil),
+			$elm$core$List$foldl($author$project$Main$reduce),
+			list).b);
+};
+var $elm$html$Html$pre = _VirtualDom_node('pre');
+var $elm$core$List$singleton = function (value) {
+	return _List_fromArray(
+		[value]);
+};
+var $elm$html$Html$textarea = _VirtualDom_node('textarea');
+var $elm$core$Debug$toString = _Debug_toString;
+var $elm$core$List$unzip = function (pairs) {
+	var step = F2(
+		function (_v0, _v1) {
+			var x = _v0.a;
+			var y = _v0.b;
+			var xs = _v1.a;
+			var ys = _v1.b;
+			return _Utils_Tuple2(
+				A2($elm$core$List$cons, x, xs),
+				A2($elm$core$List$cons, y, ys));
+		});
+	return A3(
+		$elm$core$List$foldr,
+		step,
+		_Utils_Tuple2(_List_Nil, _List_Nil),
+		pairs);
+};
+var $elm$core$List$maximum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $elm$core$List$minimum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Main$viewTable = function (list) {
+	var _v0 = $elm$core$List$unzip(list);
+	var labels = _v0.a;
+	var levels = _v0.b;
+	var max = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$maximum(levels));
+	var min = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$minimum(levels));
+	return $elm$core$List$reverse(
+		A2(
+			$elm$core$List$map,
+			function (level) {
+				return A3(
+					$elm$core$List$foldl,
+					F2(
+						function (_v1, result) {
+							var label = _v1.a;
+							var pos = _v1.b;
+							return _Utils_eq(pos, level) ? _Utils_ap(result, label) : (result + ' ');
+						}),
+					'',
+					list);
+			},
+			A2($elm$core$List$range, min, max)));
+};
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
 			[
-				$elm$html$Html$text('Hello world!')
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$textarea,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onInput($author$project$Main$Input)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(model.input)
+							])),
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Events$onClick($author$project$Main$Submit)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Dịch...')
+							]))
+					])),
+				A2(
+				$elm$html$Html$ul,
+				_List_Nil,
+				A2(
+					$elm$core$List$map,
+					function (status) {
+						return A2(
+							$elm$html$Html$li,
+							_List_Nil,
+							_List_fromArray(
+								[
+									$elm$html$Html$text(status)
+								]));
+					},
+					model.status)),
+				A2(
+				$elm$html$Html$p,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						$elm$core$Debug$toString(
+							$elm$core$List$unzip(
+								$author$project$Main$logic(model.input))))
+					])),
+				A2(
+				$elm$html$Html$pre,
+				_List_Nil,
+				A2(
+					$elm$core$List$map,
+					A2(
+						$elm$core$Basics$composeL,
+						A2(
+							$elm$core$Basics$composeL,
+							$elm$html$Html$p(_List_Nil),
+							$elm$core$List$singleton),
+						$elm$html$Html$text),
+					$author$project$Main$viewTable(
+						$author$project$Main$logic(model.input))))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
@@ -10573,4 +10795,4 @@ var $author$project$Main$main = $elm$browser$Browser$element(
 		view: $author$project$Main$view
 	});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{},"unions":{"Main.Msg":{"args":[],"tags":{"Msg1":[],"Msg2":[]}}}}})}});}(this));
+	$elm$json$Json$Decode$succeed(_Utils_Tuple0))({"versions":{"elm":"0.19.1"},"types":{"message":"Main.Msg","aliases":{},"unions":{"Main.Msg":{"args":[],"tags":{"Input":["String.String"],"Submit":[],"Check":[]}},"String.String":{"args":[],"tags":{"String":[]}}}}})}});}(this));
