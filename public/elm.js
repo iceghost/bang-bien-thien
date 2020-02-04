@@ -10561,6 +10561,180 @@ var $ccapndave$elm_update_extra$Update$Extra$andThen = F3(
 				_List_fromArray(
 					[cmd, cmd_])));
 	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$List$maximum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var $elm$core$String$repeatHelp = F3(
+	function (n, chunk, result) {
+		return (n <= 0) ? result : A3(
+			$elm$core$String$repeatHelp,
+			n >> 1,
+			_Utils_ap(chunk, chunk),
+			(!(n & 1)) ? result : _Utils_ap(result, chunk));
+	});
+var $elm$core$String$repeat = F2(
+	function (n, chunk) {
+		return A3($elm$core$String$repeatHelp, n, chunk, '');
+	});
+var $author$project$Main$format = function (list) {
+	var max = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$maximum(
+			A2(
+				$elm$core$List$map,
+				A2(
+					$elm$core$Basics$composeR,
+					$elm$core$List$head,
+					A2(
+						$elm$core$Basics$composeR,
+						$elm$core$Maybe$withDefault(_List_Nil),
+						$elm$core$List$length)),
+				list)));
+	return '\\( \\begin{array}{c|' + (A2($elm$core$String$repeat, max - 1, 'c') + ('}' + (A2(
+		$elm$core$String$join,
+		'\\\\ \\hline ',
+		A2(
+			$elm$core$List$map,
+			A2(
+				$elm$core$Basics$composeR,
+				$elm$core$List$map(
+					$elm$core$String$join('&')),
+				$elm$core$String$join('\\\\')),
+			list)) + '\\end{array} \\)')));
+};
+var $elm$core$String$lines = _String_lines;
+var $author$project$Main$reduce = F2(
+	function (text, _v0) {
+		var pos = _v0.a;
+		var list = _v0.b;
+		switch (text) {
+			case 'lên':
+				return _Utils_Tuple2(
+					pos + 2,
+					A2(
+						$elm$core$List$cons,
+						_Utils_Tuple2('\\nearrow', pos + 1),
+						list));
+			case 'xuống':
+				return _Utils_Tuple2(
+					pos - 2,
+					A2(
+						$elm$core$List$cons,
+						_Utils_Tuple2('\\searrow', pos - 1),
+						list));
+			case '.':
+				return _Utils_Tuple2(
+					pos,
+					A2(
+						$elm$core$List$cons,
+						_Utils_Tuple2('', pos),
+						list));
+			default:
+				return _Utils_Tuple2(
+					pos,
+					A2(
+						$elm$core$List$cons,
+						_Utils_Tuple2(text, pos),
+						list));
+		}
+	});
+var $elm$core$String$words = _String_words;
+var $author$project$Main$logic = function (text) {
+	var list = $elm$core$String$lines(text);
+	return A2(
+		$elm$core$List$map,
+		A2(
+			$elm$core$Basics$composeR,
+			$elm$core$String$words,
+			A2(
+				$elm$core$Basics$composeR,
+				A2(
+					$elm$core$List$foldl,
+					$author$project$Main$reduce,
+					_Utils_Tuple2(0, _List_Nil)),
+				A2($elm$core$Basics$composeR, $elm$core$Tuple$second, $elm$core$List$reverse))),
+		list);
+};
+var $author$project$Main$sendTable = _Platform_outgoingPort('sendTable', $elm$json$Json$Encode$string);
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $elm$core$List$minimum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$List$unzip = function (pairs) {
+	var step = F2(
+		function (_v0, _v1) {
+			var x = _v0.a;
+			var y = _v0.b;
+			var xs = _v1.a;
+			var ys = _v1.b;
+			return _Utils_Tuple2(
+				A2($elm$core$List$cons, x, xs),
+				A2($elm$core$List$cons, y, ys));
+		});
+	return A3(
+		$elm$core$List$foldr,
+		step,
+		_Utils_Tuple2(_List_Nil, _List_Nil),
+		pairs);
+};
+var $author$project$Main$viewRow = function (list) {
+	var _v0 = $elm$core$List$unzip(list);
+	var labels = _v0.a;
+	var levels = _v0.b;
+	var max = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$maximum(levels));
+	var min = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$minimum(levels));
+	return $elm$core$List$reverse(
+		A2(
+			$elm$core$List$map,
+			function (level) {
+				return A2(
+					$elm$core$List$map,
+					function (_v1) {
+						var label = _v1.a;
+						var pos = _v1.b;
+						return _Utils_eq(pos, level) ? label : '';
+					},
+					list);
+			},
+			A2($elm$core$List$range, min, max)));
+};
+var $author$project$Main$viewTable = function (list) {
+	return A2($elm$core$List$map, $author$project$Main$viewRow, list);
+};
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -10582,7 +10756,10 @@ var $author$project$Main$update = F2(
 							{
 								status: A2($elm$core$List$cons, 'Submitted', model.status)
 							}),
-						$elm$core$Platform$Cmd$none));
+						$author$project$Main$sendTable(
+							$author$project$Main$format(
+								$author$project$Main$viewTable(
+									$author$project$Main$logic(model.input))))));
 			default:
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -10597,121 +10774,7 @@ var $author$project$Main$Input = function (a) {
 	return {$: 'Input', a: a};
 };
 var $author$project$Main$Submit = {$: 'Submit'};
-var $author$project$Main$reduce = F2(
-	function (text, _v0) {
-		var pos = _v0.a;
-		var list = _v0.b;
-		switch (text) {
-			case 'u':
-				return _Utils_Tuple2(
-					pos + 2,
-					A2(
-						$elm$core$List$cons,
-						_Utils_Tuple2(text, pos + 1),
-						list));
-			case 'd':
-				return _Utils_Tuple2(
-					pos - 2,
-					A2(
-						$elm$core$List$cons,
-						_Utils_Tuple2(text, pos - 1),
-						list));
-			default:
-				return _Utils_Tuple2(
-					pos,
-					A2(
-						$elm$core$List$cons,
-						_Utils_Tuple2(text, pos),
-						list));
-		}
-	});
-var $elm$core$String$words = _String_words;
-var $author$project$Main$logic = function (text) {
-	var list = $elm$core$String$words(text);
-	return $elm$core$List$reverse(
-		A3(
-			$elm$core$Basics$apR,
-			_Utils_Tuple2(0, _List_Nil),
-			$elm$core$List$foldl($author$project$Main$reduce),
-			list).b);
-};
-var $elm$html$Html$pre = _VirtualDom_node('pre');
-var $elm$core$List$singleton = function (value) {
-	return _List_fromArray(
-		[value]);
-};
 var $elm$html$Html$textarea = _VirtualDom_node('textarea');
-var $elm$core$Debug$toString = _Debug_toString;
-var $elm$core$List$unzip = function (pairs) {
-	var step = F2(
-		function (_v0, _v1) {
-			var x = _v0.a;
-			var y = _v0.b;
-			var xs = _v1.a;
-			var ys = _v1.b;
-			return _Utils_Tuple2(
-				A2($elm$core$List$cons, x, xs),
-				A2($elm$core$List$cons, y, ys));
-		});
-	return A3(
-		$elm$core$List$foldr,
-		step,
-		_Utils_Tuple2(_List_Nil, _List_Nil),
-		pairs);
-};
-var $elm$core$List$maximum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$Basics$min = F2(
-	function (x, y) {
-		return (_Utils_cmp(x, y) < 0) ? x : y;
-	});
-var $elm$core$List$minimum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$Main$viewTable = function (list) {
-	var _v0 = $elm$core$List$unzip(list);
-	var labels = _v0.a;
-	var levels = _v0.b;
-	var max = A2(
-		$elm$core$Maybe$withDefault,
-		0,
-		$elm$core$List$maximum(levels));
-	var min = A2(
-		$elm$core$Maybe$withDefault,
-		0,
-		$elm$core$List$minimum(levels));
-	return $elm$core$List$reverse(
-		A2(
-			$elm$core$List$map,
-			function (level) {
-				return A3(
-					$elm$core$List$foldl,
-					F2(
-						function (_v1, result) {
-							var label = _v1.a;
-							var pos = _v1.b;
-							return _Utils_eq(pos, level) ? _Utils_ap(result, label) : (result + ' ');
-						}),
-					'',
-					list);
-			},
-			A2($elm$core$List$range, min, max)));
-};
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -10760,29 +10823,15 @@ var $author$project$Main$view = function (model) {
 					},
 					model.status)),
 				A2(
-				$elm$html$Html$p,
-				_List_Nil,
+				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$text(
-						$elm$core$Debug$toString(
-							$elm$core$List$unzip(
-								$author$project$Main$logic(model.input))))
-					])),
-				A2(
-				$elm$html$Html$pre,
-				_List_Nil,
-				A2(
-					$elm$core$List$map,
-					A2(
-						$elm$core$Basics$composeL,
-						A2(
-							$elm$core$Basics$composeL,
-							$elm$html$Html$p(_List_Nil),
-							$elm$core$List$singleton),
-						$elm$html$Html$text),
-					$author$project$Main$viewTable(
-						$author$project$Main$logic(model.input))))
+						$elm$html$Html$Attributes$id('math')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('\\( wait \\)')
+					]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(

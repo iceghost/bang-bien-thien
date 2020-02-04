@@ -18,6 +18,13 @@
     const app = Elm.Main.init({
       node: document.querySelector("main")
     });
+    app.ports.sendTable.subscribe((data) => {
+      console.log(data)
+      const math = document.querySelector("#math");
+      math.innerHTML = data;
+      try { MathJax.typesetClear(); MathJax.typeset(); }
+      catch (e) { console.log(e) }
+    })
   </script>
 </body>
 
