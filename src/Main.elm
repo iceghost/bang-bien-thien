@@ -163,8 +163,13 @@ view model =
                 , F.color (E.rgb 1 1 1)
                 ]
               <|
-                E.el [ E.centerX ] <|
-                    E.text "Made by Khang with ❤"
+                E.row [ E.centerX ] <|
+                    [ E.text "Viết bởi Khang, with ❤ · Mã nguồn tại "
+                    , E.link []
+                        { url = "https://github.com/iceghosttth/bang-bien-thien"
+                        , label = E.html <| H.i [ Attrs.class "fab fa-github" ] []
+                        }
+                    ]
             ]
 
 
