@@ -36,7 +36,7 @@ init _ =
         sample =
             "x 1 . 2 . 3\ny' . + 0 - .\ny -vc lên 3 xuống -vc"
     in
-    ( Model sample "" "Kết quả", sample |> logic |> viewTable |> format |> sendTable )
+    ( Model sample "" "", Cmd.none )
 
 
 type Msg
@@ -146,7 +146,7 @@ view model =
                             }
                         ]
                     , E.el [ E.centerX, F.italic ] (E.text model.status)
-                    , E.el [ E.htmlAttribute <| Attrs.id "math", E.centerX ] <| E.none
+                    , E.el [ E.htmlAttribute <| Attrs.id "math", E.centerX, F.size 20 ] <| E.none
                     , E.link
                         [ E.htmlAttribute <| Attrs.id "download"
                         , E.centerX

@@ -1,7 +1,3 @@
-window.MathJax = {
-  loader: { load: ["input/tex", "output/svg"] }
-};
-
 const app = Elm.Main.init({
   node: document.querySelector("main")
 });
@@ -13,7 +9,7 @@ app.ports.sendTable.subscribe((data) => {
   math.innerHTML = data;
   id.setAttribute("href", "https://latex.codecogs.com/png.latex?\\dpi{300} \\bg_white " + data.slice(2, -2))
   id.innerHTML = "Tải ảnh"
-  try { 
+  try {
     MathJax.typesetClear(["#math"]);
     MathJax.typeset(["#math"]);
   }
