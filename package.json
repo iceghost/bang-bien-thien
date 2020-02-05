@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "elm-live src/Main.elm -d ./public -o -h -- --debug --output ./public/elm.js",
+    "serve": "elm-live src/Main.elm -d ./public -o -h --host 0.0.0.0 -- --debug --output ./public/elm.js",
     "build": "elm make src/Main.elm --output ./public/elm.js --optimize"
   },
   "keywords": [],

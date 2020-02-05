@@ -109,7 +109,7 @@ blue =
 
 view : Model -> H.Html Msg
 view model =
-    E.layout [ F.family [ F.typeface "Open Sans" ] ] <|
+    E.layout [ F.family [ F.typeface "Roboto", F.sansSerif ] ] <|
         E.column [ E.width E.fill, E.height E.fill ]
             [ E.el [ E.height E.fill, E.width E.fill ] <|
                 E.column
@@ -121,8 +121,6 @@ view model =
                     [ E.el
                         [ E.centerX
                         , F.extraBold
-                        , F.family [ F.typeface "Roboto" ]
-                        , F.variant F.smallCaps
                         , F.color blue
                         ]
                         (E.text "Công cụ dịch bảng biến thiên sang \\( \\LaTeX \\)")
