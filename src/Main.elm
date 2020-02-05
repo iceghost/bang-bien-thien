@@ -1,10 +1,13 @@
 port module Main exposing (main)
 
 import Browser
+import Element as E
+import Element.Background as Background
+import Element.Border as B
+import Element.Font as F
+import Element.Input as I
 import Html as H
 import Html.Attributes as Attrs
-import Html.Events as Events
-import Update.Extra as Update
 
 
 port sendTable : String -> Cmd msg
@@ -22,19 +25,23 @@ main =
 
 type alias Model =
     { input : String
-    , status : List String
+    , output : String
+    , status : String
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Model "" [], Cmd.none )
+    let
+        sample =
+            "x 1 . 2 . 3\ny' . + 0 - .\ny -vc lên 3 xuống -vc"
+    in
+    ( Model sample "" "Kết quả", sample |> logic |> viewTable |> format |> sendTable )
 
 
 type Msg
     = Input String
     | Submit
-    | Check
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -44,15 +51,15 @@ update msg model =
             ( { model | input = text }, Cmd.none )
 
         Submit ->
-            ( { model | status = "Submitted" :: model.status }, sendTable (model.input |> logic |> viewTable |> format) )
-                |> Update.andThen update Check
-
-        Check ->
-            ( { model | status = "Valid" :: model.status }, Cmd.none )
+            let
+                output =
+                    model.input |> logic |> viewTable |> format
+            in
+            ( { model | output = output }, sendTable output )
 
 
 type alias Position =
-    ( String, Int )
+    ( String, Maybe Int )
 
 
 logic : String -> List (List Position)
@@ -74,29 +81,91 @@ reduce : String -> ( Int, List Position ) -> ( Int, List Position )
 reduce text ( pos, list ) =
     case text of
         "lên" ->
-            ( pos + 2, ( "\\nearrow", pos + 1 ) :: list )
+            ( pos + 2, ( "\\nearrow", Just (pos + 1) ) :: list )
 
         "xuống" ->
-            ( pos - 2, ( "\\searrow", pos - 1 ) :: list )
+            ( pos - 2, ( "\\searrow", Just (pos - 1) ) :: list )
 
         "." ->
-            ( pos, ( "", pos ) :: list )
-        
+            ( pos, ( "", Just pos ) :: list )
+
+        "+vc" ->
+            ( pos, ( "+\\infty", Just pos ) :: list )
+
+        "-vc" ->
+            ( pos, ( "-\\infty", Just pos ) :: list )
+
+        "||" ->
+            ( pos, ( "||", Nothing ) :: list )
+
         _ ->
-            ( pos, ( text, pos ) :: list )
+            ( pos, ( text, Just pos ) :: list )
+
+
+blue : E.Color
+blue =
+    E.rgb255 18 147 216
 
 
 view : Model -> H.Html Msg
 view model =
-    H.div []
-        [ H.div []
-            [ H.textarea [ Events.onInput Input ] [ H.text model.input ]
-            , H.button [ Events.onClick Submit ] [ H.text "Dịch..." ]
+    E.layout [ F.family [ F.typeface "Open Sans" ] ] <|
+        E.column [ E.width E.fill, E.height E.fill ]
+            [ E.el [ E.height E.fill, E.width E.fill ] <|
+                E.column
+                    [ E.centerY
+                    , E.centerX
+                    , 400 |> E.px |> E.width
+                    , E.spacing 10
+                    ]
+                    [ E.el
+                        [ E.centerX
+                        , F.extraBold
+                        , F.family [ F.typeface "Roboto" ]
+                        , F.variant F.smallCaps
+                        , F.color blue
+                        ]
+                        (E.text "Công cụ dịch bảng biến thiên sang \\( \\LaTeX \\)")
+                    , E.column [ E.spacingXY 0 5, F.hairline ]
+                        [ I.multiline [ 400 |> E.px |> E.width, 200 |> E.px |> E.height ]
+                            { spellcheck = False
+                            , onChange = Input
+                            , text = model.input
+                            , placeholder = Nothing
+                            , label = I.labelHidden "Math input"
+                            }
+                        , I.button
+                            [ E.alignRight
+                            , B.width 1
+                            , E.padding 5
+                            , B.color (E.rgb255 186 189 182)
+                            , B.rounded 3
+                            ]
+                            { onPress = Just Submit
+                            , label = E.text "Dịch..."
+                            }
+                        ]
+                    , E.el [ E.centerX, F.italic ] (E.text model.status)
+                    , E.el [ E.htmlAttribute <| Attrs.id "math", E.centerX ] <| E.none
+                    , E.link
+                        [ E.htmlAttribute <| Attrs.id "download"
+                        , E.centerX
+                        , F.underline
+                        , F.size 13
+                        ]
+                        { url = "", label = E.text "" }
+                    ]
+            , E.el
+                [ E.width E.fill
+                , F.size 15
+                , E.paddingXY 0 10
+                , Background.color blue
+                , F.color (E.rgb 1 1 1)
+                ]
+              <|
+                E.el [ E.centerX ] <|
+                    E.text "Made by Khang with ❤"
             ]
-        , H.ul [] <|
-            List.map (\status -> H.li [] [ H.text status ]) model.status
-        , H.div [ Attrs.id "math" ] [ H.text "\\( wait \\)" ]
-        ]
 
 
 viewRow : List Position -> List (List String)
@@ -106,16 +175,16 @@ viewRow list =
             list |> List.unzip
 
         max =
-            Maybe.withDefault 0 (List.maximum levels)
+            Maybe.withDefault 0 (levels |> List.map (Maybe.withDefault 0) |> List.maximum)
 
         min =
-            Maybe.withDefault 0 (List.minimum levels)
+            Maybe.withDefault 0 (levels |> List.map (Maybe.withDefault 0) |> List.minimum)
     in
     List.map
         (\level ->
             List.map
                 (\( label, pos ) ->
-                    if pos == level then
+                    if pos == Just level || pos == Nothing then
                         label
 
                     else
