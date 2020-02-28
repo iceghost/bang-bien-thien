@@ -1,9 +1,11 @@
+import { Elm } from './elm/Main.elm'
+
 const app = Elm.Main.init({
   node: document.querySelector("main")
 });
 
 app.ports.sendTable.subscribe((data) => {
-  console.log(data)
+  // console.log(data)
   const math = document.querySelector("#math");
   const id = document.querySelector("#download")
   math.innerHTML = data;
