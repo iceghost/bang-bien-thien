@@ -74,7 +74,7 @@ update msg model =
             let
                 input = 
                     case name of                            
-                        "y = 1/x" ->
+                        "y = -1/x" ->
                             "x -vc . . 0 . . +vc\nf' . + . || . +\nf 0 lên +vc ||-4 -vc lên 0"
 
                         _ ->
@@ -175,7 +175,7 @@ view model =
                         [ text "... hoặc dùng"
                         , select [ Events.onInput GetExample, class "border-b border-dashed border-blue-900" ]
                             [ option [] [ text "bảng mẫu" ]
-                            , option [] [ text "y = 1/x" ]
+                            , option [] [ text "y = -1/x" ]
                             ]
                         ]
                     , textarea
